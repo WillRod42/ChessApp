@@ -113,10 +113,10 @@ public class PieceManager : MonoBehaviour
 		{
 			case PieceType.pawn: return PawnMoves(piece.cell.location, piece.isWhitePiece);
 			case PieceType.knight: return KnightMoves(piece.cell.location);
-			case PieceType.bishop: return BishopMoves(piece.cell.location);
-			case PieceType.rook: return RookMoves(piece.cell.location);
+			case PieceType.bishop: return BoardManager.GetDiagonalCells(piece.cell.location);;
+			case PieceType.rook: return BoardManager.GetCellsPlus(piece.cell.location);
 			case PieceType.queen: return QueenMoves(piece.cell.location);
-			default: return KingMoves(piece.cell.location);
+			default: return BoardManager.GetAdjacentCells(piece.cell.location);
 		}
 	}
 
@@ -125,6 +125,7 @@ public class PieceManager : MonoBehaviour
 	private static List<Cell> PawnMoves(int location, bool isWhitePiece)
 	{
 		//Add diagonal capture
+		//Add double move
 		List<Cell> moves = new List<Cell>();
 		moves.Add(BoardManager.GetCell(location + (isWhitePiece ? 1 : -1)));
 		return moves;
@@ -132,17 +133,26 @@ public class PieceManager : MonoBehaviour
 
 	private static List<Cell> KnightMoves(int location)
 	{
-		return null;
-	}
+		List<Cell> moves = new List<Cell>();
+		moves.Add(BoardManager.GetCell(location - 8));
+		moves.Add(BoardManager.GetCell(location + 12));
+		moves.Add(BoardManager.GetCell(location + 21));
+		moves.Add(BoardManager.GetCell(location + 19));
+		moves.Add(BoardManager.GetCell(location + 8));
+		moves.Add(BoardManager.GetCell(location - 12));
+		moves.Add(BoardManager.GetCell(location - 21));
+		moves.Add(BoardManager.GetCell(location - 19));
 
-	private static List<Cell> BishopMoves(int location)
-	{
-		return BoardManager.GetDiagonalCells(location);
-	}
+		for (int i = 0; i < moves.Count; i++)
+		{
+			if (moves[i] == null)
+			{
+				moves.Remove(moves[i]);
+				i--;
+			}
+		}
 
-	private static List<Cell> RookMoves(int location)
-	{
-		return BoardManager.GetCellsPlus(location);
+		return moves;
 	}
 
 	private static List<Cell> QueenMoves(int location)
@@ -150,10 +160,5 @@ public class PieceManager : MonoBehaviour
 		List<Cell> moves = BoardManager.GetDiagonalCells(location);
 		moves.AddRange(BoardManager.GetCellsPlus(location));
 		return moves;
-	}
-
-	private static List<Cell> KingMoves(int location)
-	{
-		return BoardManager.GetAdjacentCells(location);
 	}
 }
