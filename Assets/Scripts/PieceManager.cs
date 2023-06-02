@@ -158,7 +158,7 @@ public class PieceManager : MonoBehaviour
 		List<Cell> moves = new List<Cell>();
 		switch (piece.pieceType)
 		{
-			case PieceType.pawn: moves = PawnMoves(piece.cell.location, piece.isWhitePiece); break;
+			case PieceType.pawn: moves = PawnMoves(piece.cell.location, piece.isWhitePiece, piece.hasMoved); break;
 			case PieceType.knight: moves = KnightMoves(piece.cell.location, piece.isWhitePiece); break;
 			case PieceType.bishop: moves = BoardManager.GetDiagonalCells(piece.cell.location); break;
 			case PieceType.rook: moves = BoardManager.GetCellsPlus(piece.cell.location); break;
@@ -171,12 +171,32 @@ public class PieceManager : MonoBehaviour
 
 	// Add in checks for moves putting king in check
 	// Remove moves blocked by other pieces
-	private static List<Cell> PawnMoves(int location, bool isWhitePiece)
+	private static List<Cell> PawnMoves(int location, bool isWhitePiece, bool hasMoved)
 	{
-		//Add diagonal capture
-		//Add double move
 		List<Cell> moves = new List<Cell>();
-		moves.Add(BoardManager.GetCell(location + (isWhitePiece ? 1 : -1)));
+		Cell moveOne = BoardManager.GetCell(location + (isWhitePiece ? 1 : -1));
+		if (moveOne.piece == null)
+		{
+			moves.Add(moveOne);
+			if (!hasMoved)
+			{
+				Cell moveTwo = BoardManager.GetCell(location + (isWhitePiece ? 2 : -2));
+				if (moveTwo.piece == null)
+					moves.Add(moveTwo);
+			}
+		}
+
+		Cell captureLeft = BoardManager.GetCell(location - 10 + (isWhitePiece ? 1 : -1));
+		Cell captureRight = BoardManager.GetCell(location + 10 + (isWhitePiece ? 1 : -1));
+		if (captureLeft != null && captureLeft.piece != null && captureLeft.piece.isWhitePiece != isWhitePiece)
+		{
+			moves.Add(captureLeft);
+		}
+		if (captureRight != null && captureRight.piece != null && captureRight.piece.isWhitePiece != isWhitePiece)
+		{
+			moves.Add(captureRight);
+		}
+		
 		return moves;
 	}
 
