@@ -23,10 +23,14 @@ public class Piece
 	}
 
 	public void Move(Cell toMove)
-	{	
+	{
 		if (toMove.piece != null)
 		{
 			PieceManager.CapturePiece(toMove.piece);
+		}
+		else if (toMove == PieceManager.enPassantCell)
+		{
+			PieceManager.CapturePiece(PieceManager.enPassant);
 		}
 
 		cell.piece = null;

@@ -8,6 +8,9 @@ public class PieceManager : MonoBehaviour
 	[SerializeField] private GameObject board;
 
 	public static bool whitesTurn;
+	public static bool playerIsWhitePieces;
+	public static Piece enPassant;
+	public static Cell enPassantCell;
 
 	private static List<Piece> whitePieces;
 	private static List<Piece> blackPieces;
@@ -22,12 +25,12 @@ public class PieceManager : MonoBehaviour
 		king
 	}
 
-	public void Initialize(bool playerIsWhitePieces)
+	public void Initialize()
 	{
 		whitePieces = new List<Piece>();
 		blackPieces = new List<Piece>();
 		whitesTurn = true;
-		for (int i = 0; i < BoardManager.BOARD_WIDTH; i++)
+;		for (int i = 0; i < BoardManager.BOARD_WIDTH; i++)
 		{
 			if (playerIsWhitePieces)
 			{
@@ -124,6 +127,9 @@ public class PieceManager : MonoBehaviour
 		{
 			blackPieces.Remove(piece);
 		}
+
+		piece.cell.piece = null;
+		piece.cell = null;
 	}
 
 	public static void TogglePieces()
@@ -170,33 +176,41 @@ public class PieceManager : MonoBehaviour
 	}
 
 	// Add in checks for moves putting king in check
-	// Remove moves blocked by other pieces
 	private static List<Cell> PawnMoves(int location, bool isWhitePiece, bool hasMoved)
 	{
 		List<Cell> moves = new List<Cell>();
-		Cell moveOne = BoardManager.GetCell(location + (isWhitePiece ? 1 : -1));
+		int direction = (isWhitePiece ? 1 : -1) * (playerIsWhitePieces ? 1 : -1);
+		Cell moveOne = BoardManager.GetCell(location + direction);
 		if (moveOne.piece == null)
 		{
 			moves.Add(moveOne);
 			if (!hasMoved)
 			{
-				Cell moveTwo = BoardManager.GetCell(location + (isWhitePiece ? 2 : -2));
+				Cell moveTwo = BoardManager.GetCell(location + (direction * 2));
 				if (moveTwo.piece == null)
 					moves.Add(moveTwo);
 			}
 		}
 
-		Cell captureLeft = BoardManager.GetCell(location - 10 + (isWhitePiece ? 1 : -1));
-		Cell captureRight = BoardManager.GetCell(location + 10 + (isWhitePiece ? 1 : -1));
+		Cell captureLeft = BoardManager.GetCell(location - 10 + direction);
+		Cell captureRight = BoardManager.GetCell(location + 10 + direction);
 		if (captureLeft != null && captureLeft.piece != null && captureLeft.piece.isWhitePiece != isWhitePiece)
 		{
 			moves.Add(captureLeft);
 		}
+		else if (enPassant != null && enPassant.cell == BoardManager.GetCell(location - 10))
+		{
+			moves.Add(captureLeft);
+		}
+
 		if (captureRight != null && captureRight.piece != null && captureRight.piece.isWhitePiece != isWhitePiece)
 		{
 			moves.Add(captureRight);
 		}
-		
+		else if (enPassant != null && enPassant.cell == BoardManager.GetCell(location + 10))
+		{
+			moves.Add(captureRight);
+		}		
 		return moves;
 	}
 

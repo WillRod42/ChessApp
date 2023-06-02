@@ -18,7 +18,8 @@ public class GameManager : MonoBehaviour
   private void Start()
   {
     pieceManager = GetComponent<PieceManager>();
-		pieceManager.Initialize(isPlayerWhitePieces);
+		PieceManager.playerIsWhitePieces = isPlayerWhitePieces;
+		pieceManager.Initialize();
   }
 
   private void Update()
