@@ -7,8 +7,10 @@ public class PieceManager : MonoBehaviour
 	[SerializeField] private GameObject wPawn, wBishop, wKnight, wRook, wQueen, wKing, bPawn, bBishop, bKnight, bRook, bQueen, bKing;
 	[SerializeField] private GameObject board;
 
-	private List<Piece> whitePieces;
-	private List<Piece> blackPieces;
+	public static bool whitesTurn;
+
+	private static List<Piece> whitePieces;
+	private static List<Piece> blackPieces;
 
 	public enum PieceType
 	{
@@ -24,6 +26,7 @@ public class PieceManager : MonoBehaviour
 	{
 		whitePieces = new List<Piece>();
 		blackPieces = new List<Piece>();
+		whitesTurn = true;
 		for (int i = 0; i < BoardManager.BOARD_WIDTH; i++)
 		{
 			if (playerIsWhitePieces)
@@ -105,6 +108,25 @@ public class PieceManager : MonoBehaviour
 	public static Piece GetPiece(string name)
 	{
 		return null;
+	}
+
+	public static void CapturePiece(Piece piece)
+	{
+		piece.pieceObj.SetActive(false);
+		Destroy(piece.pieceObj);
+		if (piece.isWhitePiece)
+		{
+			whitePieces.Remove(piece);
+		}
+		else
+		{
+			blackPieces.Remove(piece);
+		}
+	}
+
+	public static void TogglePieces()
+	{
+		whitesTurn = !whitesTurn;
 	}
 
 	public static List<Cell> GetValidMoves(Piece piece)

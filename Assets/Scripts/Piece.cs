@@ -14,18 +14,25 @@ public class Piece
 		this.pieceObj = pieceObj;
 		this.pieceType = pieceType;
 		this.cell = cell;
+		cell.piece = this;
 		this.isWhitePiece = isWhitePiece;
 
 		CenterOnCell();
 	}
 
 	public void Move(Cell toMove)
-	{
+	{	
+		if (toMove.piece != null)
+		{
+			PieceManager.CapturePiece(toMove.piece);
+		}
+
 		cell.piece = null;
 		cell = toMove;
 		toMove.piece = this;
 
 		CenterOnCell();
+		PieceManager.TogglePieces();
 	}
 
 	private void CenterOnCell()
