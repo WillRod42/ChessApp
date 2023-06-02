@@ -14,10 +14,7 @@ public class PieceOnClick : MonoBehaviour
 
 	public void OnMouseDown()
 	{
-		Debug.Log("clicked " + name + " at " + piece.cell.location);
-		if (PieceManager.whitesTurn != piece.isWhitePiece)
-			return;
-			
+		Debug.Log("clicked " + name + " at " + piece.cell.location);			
 		if (selectedPiece != gameObject)
 		{
 			BoardManager.UnhighlightCells();

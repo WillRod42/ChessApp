@@ -8,6 +8,7 @@ public class Piece
 	public PieceManager.PieceType pieceType;
 	public Cell cell;
 	public bool isWhitePiece;
+	public bool hasMoved;
 
 	public Piece(GameObject pieceObj, PieceManager.PieceType pieceType, Cell cell, bool isWhitePiece)
 	{
@@ -16,6 +17,7 @@ public class Piece
 		this.cell = cell;
 		cell.piece = this;
 		this.isWhitePiece = isWhitePiece;
+		hasMoved = false;
 
 		CenterOnCell();
 	}
@@ -33,6 +35,7 @@ public class Piece
 
 		CenterOnCell();
 		PieceManager.TogglePieces();
+		hasMoved = true;
 	}
 
 	private void CenterOnCell()

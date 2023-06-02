@@ -82,15 +82,6 @@ public class BoardManager : MonoBehaviour
 		adjCells.Add(GetCell(col, row - 1));
 		adjCells.Add(GetCell(col + 1, row - 1));
 
-		for (int i = 0; i < adjCells.Count; i++)
-		{
-			if (adjCells[i] == null)
-			{
-				adjCells.Remove(adjCells[i]); 
-				i--;
-			}
-		}
-
 		return adjCells;
 	}
 
@@ -104,7 +95,11 @@ public class BoardManager : MonoBehaviour
 		{
 			col--;
 			row--;
-			diagCells.Add(GetCell(col, row));
+			Cell cell = GetCell(col, row);
+			diagCells.Add(cell);
+
+			if (cell.piece != null)
+				break;
 		}
 
 		col = GetCol(location);
@@ -113,7 +108,11 @@ public class BoardManager : MonoBehaviour
 		{
 			col++;
 			row--;
-			diagCells.Add(GetCell(col, row));
+			Cell cell = GetCell(col, row);
+			diagCells.Add(cell);
+
+			if (cell.piece != null)
+				break;
 		}
 
 		col = GetCol(location);
@@ -122,7 +121,11 @@ public class BoardManager : MonoBehaviour
 		{
 			col++;
 			row++;
-			diagCells.Add(GetCell(col, row));
+			Cell cell = GetCell(col, row);
+			diagCells.Add(cell);
+
+			if (cell.piece != null)
+				break;
 		}
 
 		col = GetCol(location);
@@ -131,7 +134,11 @@ public class BoardManager : MonoBehaviour
 		{
 			col--;
 			row++;
-			diagCells.Add(GetCell(col, row));
+			Cell cell = GetCell(col, row);
+			diagCells.Add(cell);
+
+			if (cell.piece != null)
+				break;
 		}
 
 		return diagCells;
@@ -149,7 +156,11 @@ public class BoardManager : MonoBehaviour
 		while (row > 1)
 		{
 			row--;
-			plusCells.Add(GetCell(col, row));
+			Cell cell = GetCell(col, row);
+			plusCells.Add(cell);
+
+			if (cell.piece != null)
+				break;
 		}
 
 		col = GetCol(location);
@@ -157,7 +168,11 @@ public class BoardManager : MonoBehaviour
 		while (col < 8)
 		{
 			col++;
-			plusCells.Add(GetCell(col, row));
+			Cell cell = GetCell(col, row);
+			plusCells.Add(cell);
+
+			if (cell.piece != null)
+				break;
 		}
 
 		col = GetCol(location);
@@ -165,7 +180,11 @@ public class BoardManager : MonoBehaviour
 		while (row < 8)
 		{
 			row++;
-			plusCells.Add(GetCell(col, row));
+			Cell cell = GetCell(col, row);
+			plusCells.Add(cell);
+
+			if (cell.piece != null)
+				break;
 		}
 
 		col = GetCol(location);
@@ -173,7 +192,11 @@ public class BoardManager : MonoBehaviour
 		while (col > 1)
 		{
 			col--;
-			plusCells.Add(GetCell(col, row));
+			Cell cell = GetCell(col, row);
+			plusCells.Add(cell);
+
+			if (cell.piece != null)
+				break;
 		}
 
 		return plusCells;

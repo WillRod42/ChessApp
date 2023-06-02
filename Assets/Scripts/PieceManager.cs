@@ -33,14 +33,16 @@ public class PieceManager : MonoBehaviour
 			{
 				whitePieces.Add(new Piece(Instantiate(wPawn), PieceType.pawn, BoardManager.GetCell(1 + i, 2), true));
 				blackPieces.Add(new Piece(Instantiate(bPawn), PieceType.pawn, BoardManager.GetCell(1 + i, 7), false));
+				
 			}
 			else
 			{
 				whitePieces.Add(new Piece(Instantiate(wPawn), PieceType.pawn, BoardManager.GetCell(1 + i, 7), true));
 				blackPieces.Add(new Piece(Instantiate(bPawn), PieceType.pawn, BoardManager.GetCell(1 + i, 2), false));
 			}
-		}
 
+			blackPieces[i].pieceObj.GetComponent<BoxCollider2D>().enabled = false;
+		}
 		int whitePiecesLocation;
 		int blackPiecesLocation;
 		if (playerIsWhitePieces)
@@ -126,20 +128,45 @@ public class PieceManager : MonoBehaviour
 
 	public static void TogglePieces()
 	{
+		if (whitesTurn)
+		{
+			foreach (Piece piece in whitePieces)
+			{
+				piece.pieceObj.GetComponent<BoxCollider2D>().enabled = false;
+			}
+			foreach (Piece piece in blackPieces)
+			{
+				piece.pieceObj.GetComponent<BoxCollider2D>().enabled = true;
+			}
+		}
+		else
+		{
+			foreach (Piece piece in whitePieces)
+			{
+				piece.pieceObj.GetComponent<BoxCollider2D>().enabled = true;
+			}
+			foreach (Piece piece in blackPieces)
+			{
+				piece.pieceObj.GetComponent<BoxCollider2D>().enabled = false;
+			}
+		}
 		whitesTurn = !whitesTurn;
 	}
 
 	public static List<Cell> GetValidMoves(Piece piece)
 	{
+		List<Cell> moves = new List<Cell>();
 		switch (piece.pieceType)
 		{
-			case PieceType.pawn: return PawnMoves(piece.cell.location, piece.isWhitePiece);
-			case PieceType.knight: return KnightMoves(piece.cell.location);
-			case PieceType.bishop: return BoardManager.GetDiagonalCells(piece.cell.location);;
-			case PieceType.rook: return BoardManager.GetCellsPlus(piece.cell.location);
-			case PieceType.queen: return QueenMoves(piece.cell.location);
-			default: return BoardManager.GetAdjacentCells(piece.cell.location);
+			case PieceType.pawn: moves = PawnMoves(piece.cell.location, piece.isWhitePiece); break;
+			case PieceType.knight: moves = KnightMoves(piece.cell.location, piece.isWhitePiece); break;
+			case PieceType.bishop: moves = BoardManager.GetDiagonalCells(piece.cell.location); break;
+			case PieceType.rook: moves = BoardManager.GetCellsPlus(piece.cell.location); break;
+			case PieceType.queen: moves = QueenMoves(piece.cell.location); break;
+			default: moves = BoardManager.GetAdjacentCells(piece.cell.location); break;
 		}
+
+		return RemoveBlockedCells(RemoveNullFromMoveList(moves), piece.isWhitePiece);
 	}
 
 	// Add in checks for moves putting king in check
@@ -153,7 +180,7 @@ public class PieceManager : MonoBehaviour
 		return moves;
 	}
 
-	private static List<Cell> KnightMoves(int location)
+	private static List<Cell> KnightMoves(int location, bool isWhitePiece)
 	{
 		List<Cell> moves = new List<Cell>();
 		moves.Add(BoardManager.GetCell(location - 8));
@@ -165,15 +192,6 @@ public class PieceManager : MonoBehaviour
 		moves.Add(BoardManager.GetCell(location - 21));
 		moves.Add(BoardManager.GetCell(location - 19));
 
-		for (int i = 0; i < moves.Count; i++)
-		{
-			if (moves[i] == null)
-			{
-				moves.Remove(moves[i]);
-				i--;
-			}
-		}
-
 		return moves;
 	}
 
@@ -182,5 +200,36 @@ public class PieceManager : MonoBehaviour
 		List<Cell> moves = BoardManager.GetDiagonalCells(location);
 		moves.AddRange(BoardManager.GetCellsPlus(location));
 		return moves;
+	}
+
+	/// <summary>
+	/// Returns false if cell is occupied by friendly piece
+	/// </summary>
+	private static List<Cell> RemoveBlockedCells(List<Cell> moves, bool isWhitePiece)
+	{
+		List<Cell> filteredMoves = new List<Cell>();
+		foreach (Cell cell in moves)
+		{
+			if (cell.piece == null || cell.piece.isWhitePiece != isWhitePiece)
+			{
+				filteredMoves.Add(cell);
+			}
+		}
+
+		return filteredMoves;
+	}
+
+	private static List<Cell> RemoveNullFromMoveList(List<Cell> moves)
+	{
+		List<Cell> filteredMoves = new List<Cell>();
+		foreach (Cell cell in moves)
+		{
+			if (cell != null)
+			{
+				filteredMoves.Add(cell);
+			}
+		}
+
+		return filteredMoves;
 	}
 }
