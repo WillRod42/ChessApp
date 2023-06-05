@@ -7,6 +7,9 @@ public class Cell
 	public int location;
 	public Piece piece;
 	public GameObject cellObj;
+	
+	public delegate void OnMove(Piece piece);
+	public OnMove onMove;
 
 	private Color defaultColor;
 	private Color captureColor;

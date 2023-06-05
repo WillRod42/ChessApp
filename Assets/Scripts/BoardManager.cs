@@ -221,13 +221,34 @@ public class BoardManager : MonoBehaviour
 		highlightedCells.Clear();
 	}
 
-	private static int GetCol(int location)
+	public static int GetCol(int location)
 	{
 		return location / 10;
 	}
 
-	private static int GetRow(int location)
+	public static int GetRow(int location)
 	{
 		return location % 10;
+	}
+
+	/// <summary>
+	/// Get cells on board in a straight line (non-diagonal) from starting location to ending location
+	/// start: lower number
+	/// end: higher number
+	/// </summary>
+	public static List<Cell> GetRange(int start, int end)
+	{
+		List<Cell> cells = new List<Cell>();
+		int increment = 1;
+		if (GetCol(start) != GetCol(end))
+		{
+			increment = 10;
+		}
+		for (int i = start; i <= end; i += increment)
+		{
+			cells.Add(GetCell(i));
+		}
+
+		return cells;
 	}
 }

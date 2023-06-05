@@ -26,11 +26,11 @@ public class Piece
 	{
 		if (toMove.piece != null)
 		{
-			PieceManager.CapturePiece(toMove.piece);
+			PieceManager.CapturePiece(this, toMove.piece);
 		}
-		else if (toMove == PieceManager.enPassantCell)
+		else if (toMove == PieceManager.enPassantCell && pieceType == PieceManager.PieceType.pawn)
 		{
-			PieceManager.CapturePiece(PieceManager.enPassant);
+			PieceManager.CapturePiece(this, PieceManager.enPassant);
 		}
 
 		cell.piece = null;

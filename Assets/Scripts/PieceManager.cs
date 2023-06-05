@@ -11,6 +11,8 @@ public class PieceManager : MonoBehaviour
 	public static bool playerIsWhitePieces;
 	public static Piece enPassant;
 	public static Cell enPassantCell;
+	public static List<Cell> castleCells;
+	public static List<Piece> castleRooks;
 
 	private static List<Piece> whitePieces;
 	private static List<Piece> blackPieces;
@@ -29,8 +31,11 @@ public class PieceManager : MonoBehaviour
 	{
 		whitePieces = new List<Piece>();
 		blackPieces = new List<Piece>();
+		castleCells = new List<Cell>();
+		castleRooks = new List<Piece>();
 		whitesTurn = true;
-;		for (int i = 0; i < BoardManager.BOARD_WIDTH; i++)
+		
+		for (int i = 0; i < BoardManager.BOARD_WIDTH; i++)
 		{
 			if (playerIsWhitePieces)
 			{
@@ -115,21 +120,24 @@ public class PieceManager : MonoBehaviour
 		return null;
 	}
 
-	public static void CapturePiece(Piece piece)
+	public static void CapturePiece(Piece capturing, Piece captured)
 	{
-		piece.pieceObj.SetActive(false);
-		Destroy(piece.pieceObj);
-		if (piece.isWhitePiece)
+		if (capturing.isWhitePiece != captured.isWhitePiece)
 		{
-			whitePieces.Remove(piece);
-		}
-		else
-		{
-			blackPieces.Remove(piece);
-		}
+			captured.pieceObj.SetActive(false);
+			Destroy(captured.pieceObj);
+			if (captured.isWhitePiece)
+			{
+				whitePieces.Remove(captured);
+			}
+			else
+			{
+				blackPieces.Remove(captured);
+			}
 
-		piece.cell.piece = null;
-		piece.cell = null;
+			captured.cell.piece = null;
+			captured.cell = null;
+		}
 	}
 
 	public static void TogglePieces()
@@ -169,7 +177,7 @@ public class PieceManager : MonoBehaviour
 			case PieceType.bishop: moves = BoardManager.GetDiagonalCells(piece.cell.location); break;
 			case PieceType.rook: moves = BoardManager.GetCellsPlus(piece.cell.location); break;
 			case PieceType.queen: moves = QueenMoves(piece.cell.location); break;
-			default: moves = BoardManager.GetAdjacentCells(piece.cell.location); break;
+			default: moves = KingMoves(piece.cell.location); break;
 		}
 
 		return RemoveBlockedCells(RemoveNullFromMoveList(moves), piece.isWhitePiece);
@@ -236,6 +244,44 @@ public class PieceManager : MonoBehaviour
 		return moves;
 	}
 
+	private static List<Cell> KingMoves(int location)
+	{
+		List<Cell> moves = new List<Cell>();
+		moves.AddRange(BoardManager.GetAdjacentCells(location));
+
+		Cell kingCell = BoardManager.GetCell(location);
+		Piece king = kingCell.piece;
+		castleCells.Clear();
+		castleRooks.Clear();
+
+		if (!king.hasMoved)
+		{
+			List<Cell> cells = new List<Cell>();
+
+			Piece leftRook = BoardManager.GetCell((BoardManager.GetRow(location)) + 10).piece;
+			List<Cell> cellsBetween = BoardManager.GetRange(leftRook.cell.location + 10, location - 10);
+			if (CheckCastleBetweenCells(leftRook, cellsBetween))
+			{
+				Cell castleCell = BoardManager.GetCell(location - 20);
+				moves.Add(castleCell);
+				castleCells.Add(BoardManager.GetCell(castleCell.location + 10));
+				castleRooks.Add(leftRook);
+			}
+
+			Piece rightRook = BoardManager.GetCell((BoardManager.GetRow(location)) + 80).piece;
+			cellsBetween = BoardManager.GetRange(location + 10, rightRook.cell.location - 10);
+			if (CheckCastleBetweenCells(rightRook, cellsBetween))
+			{
+				Cell castleCell = BoardManager.GetCell(location + 20);
+				moves.Add(castleCell);
+				castleCells.Add(BoardManager.GetCell(castleCell.location - 10));
+				castleRooks.Add(rightRook);
+			}
+		}
+
+		return moves;
+	}
+
 	/// <summary>
 	/// Returns false if cell is occupied by friendly piece
 	/// </summary>
@@ -265,5 +311,21 @@ public class PieceManager : MonoBehaviour
 		}
 
 		return filteredMoves;
+	}
+
+	private static bool CheckCastleBetweenCells(Piece rook, List<Cell> cellsBetween)
+	{
+		if (rook == null || rook.hasMoved)
+		{
+			return false;
+		}
+		foreach (Cell cell in cellsBetween)
+		{
+			if (cell.piece != null)
+			{
+				return false;
+			}
+		}
+		return true;
 	}
 }
