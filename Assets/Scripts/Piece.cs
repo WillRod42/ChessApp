@@ -33,6 +33,11 @@ public class Piece
 			PieceManager.CapturePiece(this, PieceManager.enPassant);
 		}
 
+		if (pieceType == PieceManager.PieceType.pawn && (BoardManager.GetRow(toMove.location) == 8 || BoardManager.GetRow(toMove.location) == 1))
+		{
+			Promotion.ToggleUI(this);
+		}
+
 		cell.piece = null;
 		cell = toMove;
 		toMove.piece = this;

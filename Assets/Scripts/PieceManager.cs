@@ -16,6 +16,7 @@ public class PieceManager : MonoBehaviour
 
 	private static List<Piece> whitePieces;
 	private static List<Piece> blackPieces;
+	private static GameObject pro_wBishop, pro_wKnight, pro_wRook, pro_wQueen, pro_bBishop, pro_bKnight, pro_bRook, pro_bQueen;
 
 	public enum PieceType
 	{
@@ -34,6 +35,15 @@ public class PieceManager : MonoBehaviour
 		castleCells = new List<Cell>();
 		castleRooks = new List<Piece>();
 		whitesTurn = true;
+
+		pro_wBishop = wBishop;
+		pro_wKnight = wKnight;
+		pro_wRook = wRook;
+		pro_wQueen = wQueen;
+		pro_bBishop = bBishop;
+		pro_bKnight = bKnight;
+		pro_bRook = bRook;
+		pro_bQueen = bQueen;
 		
 		for (int i = 0; i < BoardManager.BOARD_WIDTH; i++)
 		{
@@ -118,6 +128,37 @@ public class PieceManager : MonoBehaviour
 	public static Piece GetPiece(string name)
 	{
 		return null;
+	}
+
+	public static void PromotePiece(Piece pawn, PieceType newType)
+	{
+		pawn.pieceType = newType;
+		Vector3 pieceObjPos = pawn.pieceObj.transform.position;
+		Destroy(pawn.pieceObj);
+
+		if (pawn.isWhitePiece)
+		{
+			switch (newType)
+			{
+				case PieceType.rook: pawn.pieceObj = Instantiate(pro_wRook, pieceObjPos, Quaternion.identity); break;
+				case PieceType.knight: pawn.pieceObj = Instantiate(pro_wKnight, pieceObjPos, Quaternion.identity); break;
+				case PieceType.bishop: pawn.pieceObj = Instantiate(pro_wBishop, pieceObjPos, Quaternion.identity); break;
+				default: pawn.pieceObj = Instantiate(pro_wQueen, pieceObjPos, Quaternion.identity); break;
+			}
+		}
+		else
+		{
+			switch (newType)
+			{
+				case PieceType.rook: pawn.pieceObj = Instantiate(pro_bRook, pieceObjPos, Quaternion.identity); break;
+				case PieceType.knight: pawn.pieceObj = Instantiate(pro_bKnight, pieceObjPos, Quaternion.identity); break;
+				case PieceType.bishop: pawn.pieceObj = Instantiate(pro_bBishop, pieceObjPos, Quaternion.identity); break;
+				default: pawn.pieceObj = Instantiate(pro_bQueen, pieceObjPos, Quaternion.identity); break;
+			}
+		}
+
+		pawn.pieceObj.AddComponent<PieceOnClick>();
+		pawn.pieceObj.GetComponent<PieceOnClick>().piece = pawn;
 	}
 
 	public static void CapturePiece(Piece capturing, Piece captured)

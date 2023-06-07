@@ -45,6 +45,7 @@ public class CellOnClick : MonoBehaviour
 
 		piece.Move(cell);
 		PieceOnClick.selectedPiece = null;
+		PieceManager.enPassantCell = null;
 		BoardManager.UnhighlightCells();
 	}
 }
